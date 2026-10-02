@@ -1,15 +1,65 @@
-<!DOCTYPE html>
-<html lang="da">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TISSEMAND</title>
-</head>
+<form id="signupForm">
+  <input type="text" id="navn" placeholder="Navn" required>
+  <input type="email" id="email" placeholder="Email" required>
 
-<body>
+  <select id="aktivitet">
+    <option value="">Hvad vil du bruge Musiclinq til?</option>
+    <option value="tilbyde">Tilbyde ydelser</option>
+    <option value="koebe">Købe ydelser</option>
+    <option value="begge">Begge dele</option>
+  </select>
 
-  <h1>TISSEMAND</h1>
-  <p>Freelanceplatform for musikere.</p>
+  <input type="text" id="interesse" placeholder="Hvilke ydelser interesserer dig?">
+  <input type="text" id="hort_fra" placeholder="Hvor har du hørt om os?">
 
-</body>
-</html>
+  <textarea id="comment" placeholder="Valgfri kommentar"></textarea>
+
+  <button type="submit">Skriv mig op</button>
+</form>
+
+<p id="message"></p>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  const SUPABASE_URL = https://xcedzljfmwhxjfevtpuv.supabase.co
+  const SUPABASE_KEY = sb_publishable_QWdeN528NVZewIpYEJYwwQ_22X17M7w
+
+  const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  )
+
+  const form = document.getElementById("signupForm")
+  const message = document.getElementById("message")
+
+  form.addEventListener("submit", async function(event) {
+    event.preventDefault()
+
+    const data = {
+      navn: document.getElementById("navn").value,
+      email: document.getElementById("email").value,
+      aktivitet: document.getElementById("aktivitet").value,
+      interesse: document.getElementById("interesse").value,
+      hort_fra: document.getElementById("hort_fra").value,
+      comment: document.getElementById("comment").value
+    }
+
+    const { error } = await supabaseClient
+      .from("signups")
+      .insert([data])
+
+    if (error) {
+      console.error(error)
+
+      if (error.code === "23505") {
+        message.textContent = "Denne email er allerede skrevet op."
+      } else {
+        message.textContent = "Der skete en fejl. Prøv igen."
+      }
+    } else {
+      message.textContent = "Tak! Du er skrevet op."
+      form.reset()
+    }
+  })
+</script>
